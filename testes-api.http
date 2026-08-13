@@ -1,0 +1,165 @@
+### ================================================
+### SISTEMA DE BIBLIOTECA - TESTES DE API
+### ================================================
+
+### ================================================
+### LIVROS (Biblioteca - porta 8080)
+### ================================================
+
+### Listar todos os livros
+GET http://localhost:8080/book
+
+### Buscar livro por ID
+GET http://localhost:8080/book/1
+
+### Buscar livro por título
+GET http://localhost:8080/book/titulo/Clean Code
+
+### Buscar livro por autor
+GET http://localhost:8080/book/autor/Robert C. Martin
+
+### Cadastrar livro
+POST http://localhost:8080/book
+Content-Type: application/json
+
+{
+  "details": {
+    "titulo": "Clean Code",
+    "autor": "Robert C. Martin",
+    "isbn": "978-0132350884",
+    "genero": "Tecnologia",
+    "editora": "Prentice Hall"
+  }
+}
+
+### Atualizar livro
+PUT http://localhost:8080/book/1
+Content-Type: application/json
+
+{
+  "details": {
+    "titulo": "Clean Code - Atualizado",
+    "autor": "Robert C. Martin",
+    "isbn": "978-0132350884",
+    "genero": "Tecnologia",
+    "editora": "Prentice Hall"
+  }
+}
+
+### Deletar livro
+DELETE http://localhost:8080/book/1
+
+### ================================================
+### USUÁRIOS (Biblioteca - porta 8080)
+### ================================================
+
+### Listar todos os usuários
+GET http://localhost:8080/user
+
+### Buscar usuário por ID
+GET http://localhost:8080/user/1
+
+### Buscar usuário por nome
+GET http://localhost:8080/user/nome?nome=Diego Cruz
+
+### Cadastrar usuário
+POST http://localhost:8080/user
+Content-Type: application/json
+
+{
+  "details": {
+    "nome": "Diego Cruz",
+    "email": "diego@email.com",
+    "telefone": "21999999999"
+  }
+}
+
+### ================================================
+### EMPRÉSTIMOS (Loan-Service - porta 8082)
+### ================================================
+
+### Listar todos os empréstimos
+GET http://localhost:8082/loan
+
+### Buscar empréstimo por ID
+GET http://localhost:8082/loan/1
+
+### Buscar empréstimos por usuário
+GET http://localhost:8082/loan/user/1
+
+### Buscar empréstimos por livro
+GET http://localhost:8082/loan/book/1
+
+### Buscar empréstimos vencidos
+GET http://localhost:8082/loan/vencidos
+
+### Criar empréstimo
+POST http://localhost:8082/loan
+Content-Type: application/json
+
+{
+  "bookId": 1,
+  "userId": 1
+}
+
+### Teste REGRA: 3º empréstimo (deve retornar erro)
+POST http://localhost:8082/loan
+Content-Type: application/json
+
+{
+  "bookId": 3,
+  "userId": 1
+}
+
+### Teste REGRA: livro já emprestado (deve retornar erro)
+POST http://localhost:8082/loan
+Content-Type: application/json
+
+{
+  "bookId": 1,
+  "userId": 2
+}
+
+### Devolver livro
+PUT http://localhost:8082/loan/devolver/1
+
+### Deletar empréstimo
+DELETE http://localhost:8082/loan/1
+
+### ================================================
+### AVALIAÇÕES (Avaliacao-Service - porta 8081)
+### ================================================
+
+### Listar todas as avaliações
+GET http://localhost:8081/avaliacao
+
+### Buscar avaliação por ID
+GET http://localhost:8081/avaliacao/1
+
+### Buscar avaliações por livro
+GET http://localhost:8081/avaliacao/livro/1
+
+### Criar avaliação
+POST http://localhost:8081/avaliacao
+Content-Type: application/json
+
+{
+  "bookId": 1,
+  "userId": 1,
+  "nota": 5,
+  "comentario": "Excelente livro!"
+}
+
+### Teste REGRA: livro inexistente (deve retornar 404)
+POST http://localhost:8081/avaliacao
+Content-Type: application/json
+
+{
+  "bookId": 999,
+  "userId": 1,
+  "nota": 5,
+  "comentario": "Teste"
+}
+
+### Deletar avaliação
+DELETE http://localhost:8081/avaliacao/1
