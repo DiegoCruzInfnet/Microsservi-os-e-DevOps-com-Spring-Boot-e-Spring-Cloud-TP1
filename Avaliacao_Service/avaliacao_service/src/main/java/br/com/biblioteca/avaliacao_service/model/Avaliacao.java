@@ -1,25 +1,23 @@
 package br.com.biblioteca.avaliacao_service.model;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Document(collection = "avaliacoes")
 @Getter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Avaliacao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @NotNull
     private Long bookId;
@@ -35,7 +33,6 @@ public class Avaliacao {
     private String comentario;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
     public Avaliacao(Long bookId, Long userId, Integer nota, String comentario) {

@@ -28,7 +28,7 @@ public class AvaliacaoService {
         return avaliacaoRepository.findAll();
     }
 
-    public Optional<Avaliacao> findById(Long id) {
+    public Optional<Avaliacao> findById(String id) {
         return avaliacaoRepository.findById(id);
     }
 
@@ -40,7 +40,7 @@ public class AvaliacaoService {
         return avaliacaoRepository.findByUserId(userId);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         avaliacaoRepository.deleteById(id);
     }
 }

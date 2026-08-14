@@ -23,7 +23,7 @@ public class AvaliacaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Avaliacao> findById(@PathVariable Long id) {
+    public ResponseEntity<Avaliacao> findById(@PathVariable String id) {
         return avaliacaoService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -45,7 +45,7 @@ public class AvaliacaoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         avaliacaoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
