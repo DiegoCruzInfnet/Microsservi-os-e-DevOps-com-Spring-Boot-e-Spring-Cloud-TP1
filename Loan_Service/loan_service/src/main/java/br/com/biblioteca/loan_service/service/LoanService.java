@@ -4,6 +4,7 @@ import br.com.biblioteca.loan_service.client.BibliotecaClient;
 import br.com.biblioteca.loan_service.model.Loan;
 import br.com.biblioteca.loan_service.model.LoanStatus;
 import br.com.biblioteca.loan_service.repository.LoanRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,10 @@ public class LoanService {
     private final BibliotecaClient bibliotecaClient;
 
     public Loan save(Loan loan) {
-        // valida se livro existe
-        bibliotecaClient.buscarLivro(loan.getBookId());
-        // valida se usuário existe
-        bibliotecaClient.buscarUsuario(loan.getUserId());
+        // valida livro e usuário no serviço Biblioteca (chamadas protegidas por Circuit Breaker)
+        validarLivro(loan.getBookId());
+        validarUsuario(loan.getUserId());
+
         // verifica se livro está disponível
         boolean emprestado = loanRepository.existsByBookIdAndDetailsDataDevolucaoGreaterThanEqual(
                 loan.getBookId(), LocalDate.now());
@@ -36,6 +37,26 @@ public class LoanService {
             throw new IllegalStateException("Usuário já atingiu o número máximo de empréstimos!");
         }
         return loanRepository.save(loan);
+    }
+
+    @CircuitBreaker(name = "biblioteca", fallbackMethod = "fallbackLivro")
+    public void validarLivro(Long bookId) {
+        bibliotecaClient.buscarLivro(bookId);
+    }
+
+    public void fallbackLivro(Long bookId, Throwable t) {
+        throw new IllegalStateException(
+                "Serviço de Biblioteca indisponível no momento. Não foi possível validar o livro. Tente novamente mais tarde.");
+    }
+
+    @CircuitBreaker(name = "biblioteca", fallbackMethod = "fallbackUsuario")
+    public void validarUsuario(Long userId) {
+        bibliotecaClient.buscarUsuario(userId);
+    }
+
+    public void fallbackUsuario(Long userId, Throwable t) {
+        throw new IllegalStateException(
+                "Serviço de Biblioteca indisponível no momento. Não foi possível validar o usuário. Tente novamente mais tarde.");
     }
 
     public List<Loan> findAll() {
