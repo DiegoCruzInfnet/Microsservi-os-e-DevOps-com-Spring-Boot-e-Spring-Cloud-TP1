@@ -11,15 +11,15 @@
         <module name="eureka_sever" />
         <module name="api_gateway" />
       </profile>
-      <profile name="Annotation profile for avaliacao_service" enabled="true">
+      <profile name="Annotation profile for loan_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
         </processorPath>
-        <module name="avaliacao_service" />
         <module name="loan_service" />
+        <module name="avaliacao_service" />
         <module name="Biblioteca" />
       </profile>
     </annotationProcessing>

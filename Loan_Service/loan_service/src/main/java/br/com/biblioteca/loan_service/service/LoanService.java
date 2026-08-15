@@ -1,10 +1,8 @@
 package br.com.biblioteca.loan_service.service;
 
-import br.com.biblioteca.loan_service.client.BibliotecaClient;
 import br.com.biblioteca.loan_service.model.Loan;
 import br.com.biblioteca.loan_service.model.LoanStatus;
 import br.com.biblioteca.loan_service.repository.LoanRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +15,12 @@ import java.util.Optional;
 public class LoanService {
 
     private final LoanRepository loanRepository;
-    private final BibliotecaClient bibliotecaClient;
+    private final BibliotecaService bibliotecaService;
 
     public Loan save(Loan loan) {
-        // valida livro e usuário no serviço Biblioteca (chamadas protegidas por Circuit Breaker)
-        validarLivro(loan.getBookId());
-        validarUsuario(loan.getUserId());
+        // validações protegidas por Circuit Breaker (na classe BibliotecaService)
+        bibliotecaService.validarLivro(loan.getBookId());
+        bibliotecaService.validarUsuario(loan.getUserId());
 
         // verifica se livro está disponível
         boolean emprestado = loanRepository.existsByBookIdAndDetailsDataDevolucaoGreaterThanEqual(
@@ -37,26 +35,6 @@ public class LoanService {
             throw new IllegalStateException("Usuário já atingiu o número máximo de empréstimos!");
         }
         return loanRepository.save(loan);
-    }
-
-    @CircuitBreaker(name = "biblioteca", fallbackMethod = "fallbackLivro")
-    public void validarLivro(Long bookId) {
-        bibliotecaClient.buscarLivro(bookId);
-    }
-
-    public void fallbackLivro(Long bookId, Throwable t) {
-        throw new IllegalStateException(
-                "Serviço de Biblioteca indisponível no momento. Não foi possível validar o livro. Tente novamente mais tarde.");
-    }
-
-    @CircuitBreaker(name = "biblioteca", fallbackMethod = "fallbackUsuario")
-    public void validarUsuario(Long userId) {
-        bibliotecaClient.buscarUsuario(userId);
-    }
-
-    public void fallbackUsuario(Long userId, Throwable t) {
-        throw new IllegalStateException(
-                "Serviço de Biblioteca indisponível no momento. Não foi possível validar o usuário. Tente novamente mais tarde.");
     }
 
     public List<Loan> findAll() {
